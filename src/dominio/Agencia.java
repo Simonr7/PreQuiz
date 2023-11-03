@@ -1,43 +1,43 @@
-package Dominio;
+package dominio;
 
-import Dominio.Excepcion.*;
+import dominio.Exception.InmuebleArrendadoException;
+import dominio.Exception.InmuebleNoArrendableException;
+import dominio.Exception.InmuebleNoVendibleException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Agencia {
+    protected String nombre;
 
-    private String nombre;
     private List<Inmueble> inmuebles;
 
-    public Agencia(String nombre, List<Inmueble> inmuebles) {
+    public Agencia(String nombre) {
         this.nombre = nombre;
-        this.inmuebles = inmuebles;
+        this.inmuebles = new ArrayList<>();
     }
 
-    public void agregarInmueble  (Inmueble inmueble) {
+    public void agregarInmueble(Inmueble inmueble){
         this.inmuebles.add(inmueble);
-    }
 
-    public boolean arrendar(Inmueble inmueble) {
-        if (!inmueble.arrendado && inmueble instanceof Arrendable) {
-            ((Arrendable) inmueble).arrendar();
+    }
+    public boolean arrendar(Inmueble inmueble){
+        if(!inmueble.arrendado && inmueble instanceof Arrendable){
+            ((Arrendable)inmueble).arrendar();
             return true;
-        } else {
-            if (inmueble instanceof Arrendable) {
+        }
+        else{
+            if(inmueble instanceof Arrendable){
                 throw new InmuebleArrendadoException();
             }
             throw new InmuebleNoArrendableException();
         }
     }
-
-    public boolean devolver(Inmueble inmueble) {
-        if (inmueble.arrendado && inmueble instanceof Arrendable) {
-            ((Arrendable) inmueble).devolver();
+    public boolean devolver(Inmueble inmueble){
+        if(inmueble.arrendado && inmueble instanceof Arrendable){
+            ((Arrendable)inmueble).devolver();
             return true;
-        } else {
-            System.out.println("El inmueble a devolver no está arrendado");
         }
         return false;
     }
@@ -54,54 +54,16 @@ public class Agencia {
 
     public List<Inmueble> getArrendablesDisponibles() {
         return this.inmuebles.stream().filter
-                        (inmueble -> !inmueble.arrendado && inmueble instanceof Arrendable)
+                (inmuebles-> !inmuebles.arrendado && inmuebles instanceof Arrendable)
                 .collect(Collectors.toList());
     }
-
     public List<Inmueble> getArrendados() {
         List<Inmueble> arrendados = new ArrayList<>();
-
         for (Inmueble inmueble : this.inmuebles) {
             if (inmueble.arrendado) {
-                arrendados.add(inmueble);
-            }
-        }
-        return arrendados;
-    }
-
-    private List<Inmueble> getHipotecados() {
-        List<Inmueble> hipotecados = new ArrayList<>();
-
-        for (Inmueble inmueble : this.inmuebles) {
-            if (inmueble instanceof Hipotecable && ((Hipotecable) inmueble).estaHipotecado()) {
-                hipotecados.add(inmueble);
-            }
-        }
-        return hipotecados;
-    }
-
-    public void hipotecarInmueble(String codigo) {
-        Inmueble inmueble = buscarInmueblePorCodigo(codigo);
-
-        if (inmueble instanceof Hipotecable) {
-            try {
-                ((Hipotecable) inmueble).hipotecar();
-                System.out.println("Se ha hipotecado el inmueble con código " + codigo);
-            } catch (UnsupportedOperationException e) {
-                System.out.println("No se puede hipotecar el inmueble con código " + codigo + ": " + e.getMessage());
-            }
-        } else {
-            System.out.println("El inmueble con código " + codigo + " no es hipotecable.");
+            arrendados.add(inmueble);
         }
     }
-
-    private Inmueble buscarInmueblePorCodigo(String codigo) {
-        for (Inmueble inmueble : this.inmuebles) {
-            if (inmueble.getCodigo().equals(codigo)) {
-                return inmueble;
-            }
-        }
-        throw new InmuebleInexistenteException();
+        return inmuebles;
     }
-
 }
